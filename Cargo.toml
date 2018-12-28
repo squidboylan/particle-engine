@@ -1,0 +1,8 @@
+[package]
+name = "particle-engine"
+version = "0.1.0"
+authors = ["Caleb Boylan <calebboylan@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+glium = "0.21"
