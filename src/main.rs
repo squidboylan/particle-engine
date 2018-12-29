@@ -6,6 +6,11 @@ use std::error::Error;
 
 mod particles;
 
+const SCREEN_WIDTH: u32 = 1280;
+const SCREEN_HEIGHT: u32 = 720;
+
+const SCREEN_RATIO: f32 = SCREEN_WIDTH as f32/SCREEN_HEIGHT as f32;
+
 #[derive(Copy, Clone)]
 pub struct Vertex {
     position: (f32, f32, f32),
@@ -18,12 +23,12 @@ implement_vertex!(Vertex, position, color, tex_coords);
 fn main() -> Result<(), Box<Error>> {
     let mut events_loop = EventsLoop::new();
     let window = WindowBuilder::new()
-        .with_title("LearnOpenGL")
-        .with_dimensions(1024, 768);
+        .with_title("Particle Engine")
+        .with_dimensions(SCREEN_WIDTH, SCREEN_HEIGHT);
     let context = ContextBuilder::new()
         .with_vsync(true)
-        .with_gl(GlRequest::Specific(Api::OpenGl, (3, 3)));
-        //.with_multisampling(16);
+        .with_gl(GlRequest::Specific(Api::OpenGl, (3, 3)))
+        .with_multisampling(4);
 
     let display = glium::Display::new(window, context, &events_loop)?;
 
@@ -47,7 +52,7 @@ fn main() -> Result<(), Box<Error>> {
         start_time = time::Instant::now();
         if update {
             // Create 10 particles per frame
-            for _ in 0..1 {
+            for _ in 0..10 {
                 particles.create_particle(particle_center);
             }
             particles.update();
@@ -94,11 +99,11 @@ fn main() -> Result<(), Box<Error>> {
         });
 
         if w_pressed {
-            particle_center.1 += 0.05;
+            particle_center.1 += 0.05 * SCREEN_RATIO;
         }
 
         if s_pressed {
-            particle_center.1 -= 0.05;
+            particle_center.1 -= 0.05 * SCREEN_RATIO;
         }
 
         if a_pressed {

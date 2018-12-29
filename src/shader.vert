@@ -12,6 +12,5 @@ void main()
 {
     p = vec4(position * size + center, 1.0);
     gl_Position = p;
-    //fcolor = vec4((p.x + 1.0)/2, (p.y + 1.0)/2, p.z, 0.5 + p.y/2);
-    fcolor = vec4((p.x + 1.0)/2, (p.y + 1.0)/2, p.z, 1.0);
+    fcolor = vec4(col, 1.0);
 }
