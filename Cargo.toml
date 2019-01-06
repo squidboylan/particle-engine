@@ -5,6 +5,7 @@ authors = ["Caleb Boylan <calebboylan@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-glium = "0.21"
+glutin = "0.18"
+gl = "0.11"
 image = "0.20"
 rand = "0.6.1"

@@ -1,16 +1,13 @@
 #version 330 core
-in vec3 position;
-in vec3 center;
-in vec3 col;
-in float size;
-
-vec4 p;
+layout (location = 0) in vec4 vert_position;
+layout (location = 1) in vec4 offset;
+layout (location = 2) in vec4 color;
+layout (location = 4) in float size;
 
 out vec4 fcolor;
 
 void main()
 {
-    p = vec4(position * size + center, 1.0);
-    gl_Position = p;
-    fcolor = vec4(col, 1.0);
+    gl_Position = vec4((vert_position.xyz * size) + offset.xyz, 1.0);
+    fcolor = color;
 }
