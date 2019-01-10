@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<Error>> {
         .with_title("Particle Engine")
         .with_dimensions(LogicalSize::new(SCREEN_WIDTH as f64, SCREEN_HEIGHT as f64));
     let context = ContextBuilder::new()
-        .with_vsync(true)
+        .with_vsync(false)
         .with_gl(GlRequest::Specific(Api::OpenGl, (4, 3)))
         .with_multisampling(0);
 
@@ -53,6 +53,7 @@ fn main() -> Result<(), Box<Error>> {
 
 
     while window_open {
+        let start = time::Instant::now();
         for _ in 0..50 {
             particles.create_particle(particle_center);
         }
@@ -117,7 +118,6 @@ fn main() -> Result<(), Box<Error>> {
             particle_center.0 += 0.05;
         }
 
-        let start = time::Instant::now();
         unsafe {
             // Clear the screen to black
             gl::ClearColor(0.3, 0.3, 0.3, 1.0);
@@ -125,9 +125,9 @@ fn main() -> Result<(), Box<Error>> {
         }
         particles.update();
         particles.render();
+        gl_window.swap_buffers().unwrap();
         let diff = time::Instant::now() - start;
         println!("particle time: {}ms {}ns", diff.subsec_millis(), diff.subsec_nanos());
-        gl_window.swap_buffers().unwrap();
 
     }
     Ok(())

@@ -1,5 +1,5 @@
 #version 330 core
-layout (location = 0) in vec4 vert_position;
+layout (location = 0) in vec3 vert_position;
 layout (location = 1) in vec4 offset;
 layout (location = 2) in vec4 color;
 layout (location = 4) in float size;

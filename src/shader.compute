@@ -24,7 +24,11 @@ void main()
 
     p.life = p.life - 1;
     if (p.life <= 0) {
-        p.size = 0.0;
+        p.size = p.size * -1;
+    }
+
+    if (p.position.y <= -1.0) {
+        p.vel.y = p.vel.y * -0.5;
     }
 
     p.vel.y = p.vel.y - 0.001;

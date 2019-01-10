@@ -15,11 +15,11 @@ use crate::SCREEN_HEIGHT;
 use crate::SCREEN_RATIO;
 use crate::shader::*;
 
-const MAX_PARTICLES: usize = 500000;
+const MAX_PARTICLES: usize = 100000;
 
 #[derive(Copy, Clone, Default)]
 pub struct Vertex {
-    position: (f32, f32, f32, f32),
+    position: (f32, f32, f32),
 }
 
 #[derive(Copy, Clone, Default)]
@@ -52,12 +52,12 @@ impl ParticleEngine {
         let mut compute_shader = ComputeProgram::new(&include_str!("shader.compute"));
 
         let vertices: [Vertex; 6] = [
-            Vertex{ position: (0.5, 0.5 * SCREEN_RATIO, 0.0, 0.0) },
-            Vertex{ position: (0.5, -0.5 * SCREEN_RATIO, 0.0, 0.0) },
-            Vertex{ position: (-0.5, -0.5 * SCREEN_RATIO, 0.0, 0.0) },
-            Vertex{ position: (-0.5, -0.5 * SCREEN_RATIO, 0.0, 0.0) },
-            Vertex{ position: (-0.5, 0.5 * SCREEN_RATIO, 0.0, 0.0) },
-            Vertex{ position: (0.5, 0.5 * SCREEN_RATIO, 0.0, 0.0) },
+            Vertex{ position: (0.5, 0.5 * SCREEN_RATIO, 0.0) },
+            Vertex{ position: (0.5, -0.5 * SCREEN_RATIO, 0.0) },
+            Vertex{ position: (-0.5, -0.5 * SCREEN_RATIO, 0.0) },
+            Vertex{ position: (-0.5, -0.5 * SCREEN_RATIO, 0.0) },
+            Vertex{ position: (-0.5, 0.5 * SCREEN_RATIO, 0.0) },
+            Vertex{ position: (0.5, 0.5 * SCREEN_RATIO, 0.0) },
         ];
         let particles_data: Vec<Particle> = vec![Particle::default(); MAX_PARTICLES];
 
@@ -66,6 +66,10 @@ impl ParticleEngine {
         let mut particles_vbo = 0;
 
         unsafe {
+            // Enable backface culling
+            gl::Enable(gl::CULL_FACE);
+            gl::CullFace(gl::BACK);
+            gl::FrontFace(gl::CW);
             gl::GenVertexArrays(1, &mut particles_vao);
             gl::GenBuffers(1, &mut mesh_vbo);
             gl::GenBuffers(1, &mut particles_vbo);
@@ -79,7 +83,7 @@ impl ParticleEngine {
                 mem::transmute(&vertices[0]),
                 gl::STATIC_DRAW,
                 );
-            gl::VertexAttribPointer(0, 4, gl::FLOAT, gl::FALSE, 0 as i32, 0 as *const GLvoid);
+            gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE, 0 as i32, 0 as *const GLvoid);
             gl::EnableVertexAttribArray(0);
 
             gl::BindBuffer(gl::ARRAY_BUFFER, particles_vbo);
@@ -130,7 +134,7 @@ impl ParticleEngine {
             color: (0.5, 1.0, 0.0, 1.0),
             vel,
             size: 0.004,
-            life: 90,
+            life: 120,
             pad: [0.0; 2],
         };
         unsafe {
