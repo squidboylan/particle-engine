@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<Error>> {
         .with_title("Particle Engine")
         .with_dimensions(LogicalSize::new(SCREEN_WIDTH as f64, SCREEN_HEIGHT as f64));
     let context = ContextBuilder::new()
-        .with_vsync(false)
+        .with_vsync(true)
         .with_gl(GlRequest::Specific(Api::OpenGl, (4, 3)))
         .with_multisampling(0);
 
@@ -50,14 +50,18 @@ fn main() -> Result<(), Box<Error>> {
     let mut s_pressed = false;
     let mut a_pressed = false;
     let mut d_pressed = false;
+    let mut rctrl_pressed = false;
 
-
+    for _ in 0..particles::MAX_PARTICLES {
+        particles.create_particle(particle_center);
+    }
     while window_open {
         let start = time::Instant::now();
-        for _ in 0..50 {
-            particles.create_particle(particle_center);
+        if rctrl_pressed {
+            for _ in 0..50 {
+                particles.create_particle(particle_center);
+            }
         }
-
         // This is hacky and in a real game input handling would be more elegant
         events_loop.poll_events(|event| {
             match event {
@@ -84,6 +88,8 @@ fn main() -> Result<(), Box<Error>> {
                         d_pressed = true;
                     } else if v == glutin::VirtualKeyCode::A {
                         a_pressed = true;
+                    } else if v == glutin::VirtualKeyCode::RControl {
+                        rctrl_pressed = true;
                     }
                 },
                 Event::WindowEvent { event: WindowEvent::KeyboardInput {input: glutin::KeyboardInput { state: glutin::ElementState::Released, virtual_keycode: Some(v), .. }, .. }, .. } => {
@@ -95,6 +101,8 @@ fn main() -> Result<(), Box<Error>> {
                         d_pressed = false;
                     } else if v == glutin::VirtualKeyCode::A {
                         a_pressed = false;
+                    } else if v == glutin::VirtualKeyCode::RControl {
+                        rctrl_pressed = false;
                     }
                 },
 
@@ -121,14 +129,15 @@ fn main() -> Result<(), Box<Error>> {
         unsafe {
             // Clear the screen to black
             gl::ClearColor(0.3, 0.3, 0.3, 1.0);
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
         }
-        particles.update();
+        if update {
+            particles.update();
+        }
         particles.render();
         gl_window.swap_buffers().unwrap();
         let diff = time::Instant::now() - start;
-        println!("particle time: {}ms {}ns", diff.subsec_millis(), diff.subsec_nanos());
-
+        //println!("frame time: {}ms {}ns", diff.subsec_millis(), diff.subsec_nanos());
     }
     Ok(())
 }

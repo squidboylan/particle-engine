@@ -22,17 +22,26 @@ void main()
     uint index = gl_GlobalInvocationID.x;
     Particle p = particles[index];
 
-    p.life = p.life - 1;
-    if (p.life <= 0) {
+    if (p.life == 0) {
+        return;
+    }
+
+    //p.life = p.life - 1;
+    if (p.life == 0) {
         p.size = p.size * -1;
+        particles[index] = p;
+        return;
     }
 
     if (p.position.y <= -1.0) {
         p.vel.y = p.vel.y * -0.5;
+        p.position.y = p.position.y + p.vel.y;
     }
 
     p.vel.y = p.vel.y - 0.001;
     p.position.x = p.position.x + p.vel.x;
     p.position.y = p.position.y + p.vel.y;
+    // Keep particles spawned earlier in the background
+    //p.position.z = p.position.z + 0.01;
     particles[index] = p;
 }

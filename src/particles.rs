@@ -15,7 +15,7 @@ use crate::SCREEN_HEIGHT;
 use crate::SCREEN_RATIO;
 use crate::shader::*;
 
-const MAX_PARTICLES: usize = 100000;
+pub const MAX_PARTICLES: usize = 100000;
 
 #[derive(Copy, Clone, Default)]
 pub struct Vertex {
@@ -70,6 +70,11 @@ impl ParticleEngine {
             gl::Enable(gl::CULL_FACE);
             gl::CullFace(gl::BACK);
             gl::FrontFace(gl::CW);
+            // Enable Depth Testing
+            gl::Enable(gl::DEPTH_TEST);
+            gl::DepthFunc(gl::LESS);
+
+            // Setup our particle data in the GPU
             gl::GenVertexArrays(1, &mut particles_vao);
             gl::GenBuffers(1, &mut mesh_vbo);
             gl::GenBuffers(1, &mut particles_vbo);
@@ -131,10 +136,10 @@ impl ParticleEngine {
         let vel: (f32, f32, f32, f32) = (self.rng.gen_range(-0.01, 0.01), self.rng.gen_range(0.01, 0.03) * SCREEN_RATIO, 0.0, 0.0);
         let tmp_particle = Particle {
             pos: center,
-            color: (0.5, 1.0, 0.0, 1.0),
+            color: (self.rng.gen_range(0.0, 1.0), self.rng.gen_range(0.0, 1.0), self.rng.gen_range(0.0, 1.0), 1.0),
             vel,
-            size: 0.004,
-            life: 120,
+            size: 0.002,
+            life: 2400,
             pad: [0.0; 2],
         };
         unsafe {
@@ -156,7 +161,6 @@ impl ParticleEngine {
     pub fn update(&mut self) {
         self.compute_shader.enable();
         unsafe {
-            //gl::MemoryBarrier(gl::ALL_BARRIER_BITS);
             gl::MemoryBarrier(gl::BUFFER_UPDATE_BARRIER_BIT);
             gl::BindBufferBase(gl::SHADER_STORAGE_BUFFER, 0, self.particles_vbo);
             gl::DispatchCompute(MAX_PARTICLES as u32/256 + 1, 1, 1);
